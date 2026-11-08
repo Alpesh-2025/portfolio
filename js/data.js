@@ -121,13 +121,28 @@ window.PORTFOLIO = {
     },
   ],
 
+  // file:  the certificate PDF (opened / downloaded from the viewer)
+  // image: preview shown in the viewer (renders on every device, unlike PDFs on phones)
+  // Put both in the /certificates folder. Leave them "" and the Open button is hidden.
   certifications: [
-    { title: "An Introduction to Generative AI", issuer: "Infosys Wingspan / Google Cloud", date: "Sep 2024", topics: "Generative AI, LLMs, prompt engineering", credentialId: "", url: "" },
-    { title: "Python for Data Science", issuer: "Infosys Wingspan / Coursera", date: "Dec 2023", topics: "Python, NumPy, data analysis", credentialId: "", url: "" },
-    { title: "R Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Feb 2022", topics: "Data manipulation, statistics, visualization", credentialId: "2465689JTQ", url: "" },
-    { title: "Linux Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Aug 2021", topics: "Shell, system administration", credentialId: "2831554S10", url: "" },
-    { title: "C Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Jun 2021", topics: "C programming, problem solving", credentialId: "2465689JHJ", url: "" },
-    { title: "C++ Training", issuer: "Spoken Tutorial, IIT Bombay", date: "May 2021", topics: "OOP, C++ fundamentals", credentialId: "283155408X", url: "" },
+    { title: "An Introduction to Generative AI", issuer: "Infosys Springboard", date: "Sep 2024", topics: "Generative AI, LLMs, prompt engineering", credentialId: "",
+      file: "certificates/generative-ai.pdf", image: "certificates/generative-ai.webp", url: "https://verify.onwingspan.com" },
+    { title: "Python for Data Science", issuer: "Infosys Springboard", date: "Dec 2023", topics: "Python, NumPy, data analysis", credentialId: "",
+      file: "certificates/python-data-science.pdf", image: "certificates/python-data-science.webp", url: "https://verify.onwingspan.com" },
+    { title: "R Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Feb 2022", topics: "Data manipulation, statistics, visualization", credentialId: "2465689JTQ",
+      file: "certificates/r.pdf", image: "certificates/r.webp", url: "" },
+    { title: "LaTeX Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Oct 2021", topics: "Document preparation, typesetting", credentialId: "2831554SVC",
+      file: "certificates/latex.pdf", image: "certificates/latex.webp", url: "" },
+    { title: "Linux Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Aug 2021", topics: "Shell, system administration", credentialId: "2831554S10",
+      file: "certificates/linux.pdf", image: "certificates/linux.webp", url: "" },
+    { title: "C Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Jun 2021", topics: "C programming, problem solving", credentialId: "2465689JHJ",
+      file: "certificates/c.pdf", image: "certificates/c.webp", url: "" },
+    { title: "C++ Training", issuer: "Spoken Tutorial, IIT Bombay", date: "May 2021", topics: "OOP, C++ fundamentals", credentialId: "283155408X",
+      file: "certificates/cpp.pdf", image: "certificates/cpp.webp", url: "" },
+    { title: "PHP and MySQL Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Feb 2021", topics: "Server-side web development, databases", credentialId: "24656896I6",
+      file: "certificates/php-mysql.pdf", image: "certificates/php-mysql.webp", url: "" },
+    { title: "Blender Training", issuer: "Spoken Tutorial, IIT Bombay", date: "Jan 2021", topics: "3D modelling and animation", credentialId: "24656890PD",
+      file: "certificates/blender.pdf", image: "certificates/blender.webp", url: "" },
   ],
 
   contact: {

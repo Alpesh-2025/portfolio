@@ -41,6 +41,8 @@
     document.dispatchEvent(new CustomEvent("motion:ready"));
   };
   window.__unlockMotion = unlock;
+  // Freeze page scroll while the certificate viewer is open
+  document.addEventListener("viewer:toggle", (e) => { if (lenis && unlocked) e.detail ? lenis.stop() : lenis.start(); });
 
   try {
     /* ------------------------- Smooth scroll ------------------------- */

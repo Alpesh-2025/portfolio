@@ -200,17 +200,18 @@
       </div></div>`).join("")}
     </div>`;
 
-  // Compact certification rows (title + issuer · date · ID) — one line each.
+  // Compact certification rows (title + issuer · date) with an Open button that shows the certificate.
   const certList = () => `
     <div class="cert-list" data-stagger>
-      ${D.certifications.map((c) => {
-        const meta = [c.issuer, c.date, c.credentialId && `ID ${c.credentialId}`].filter(Boolean).map(esc).join(" · ");
-        const tag = c.url ? "a" : "div";
-        return `<${tag} class="card cert-row" ${c.url ? `href="${esc(c.url)}" target="_blank" rel="noopener"` : ""} ${c.topics ? `title="${esc(c.topics)}"` : ""}>
+      ${D.certifications.map((c, i) => {
+        const meta = [c.issuer, c.date].filter(Boolean).map(esc).join(" · ");
+        const canOpen = c.image || c.file;
+        return `<div class="card cert-row" ${c.topics ? `title="${esc(c.topics)}"` : ""}>
           <span class="icon-tile">${icon("award")}</span>
-          <div><h3>${esc(c.title)}</h3><span class="mono">${meta}</span></div>
-          ${c.url ? icon("external") : ""}
-        </${tag}>`;
+          <div class="cert-text"><h3>${esc(c.title)}</h3><span class="mono">${meta}</span></div>
+          ${canOpen ? `<button class="cert-open" data-cert="${i}" aria-label="Open ${esc(c.title)} certificate">${icon("eye")}<span>Open</span></button>`
+                    : c.url ? `<a class="cert-open" href="${esc(c.url)}" target="_blank" rel="noopener">${icon("external")}<span>Verify</span></a>` : ""}
+        </div>`;
       }).join("")}
     </div>`;
 
@@ -351,6 +352,100 @@
     try { await navigator.clipboard.writeText(P.email); showToast("Email copied to clipboard ✓"); }
     catch (e) { showToast(P.email); }
   });
+
+  /* ---------------------------- Certificate viewer ---------------------------- */
+  const certs = D.certifications.map((c, i) => ({ ...c, i })).filter((c) => c.image || c.file);
+  if (certs.length) {
+    const viewer = document.createElement("div");
+    viewer.className = "viewer";
+    viewer.hidden = true;
+    viewer.setAttribute("role", "dialog");
+    viewer.setAttribute("aria-modal", "true");
+    viewer.setAttribute("aria-labelledby", "vTitle");
+    viewer.setAttribute("data-lenis-prevent", "");
+    viewer.innerHTML = `
+      <div class="viewer-backdrop" data-close></div>
+      <div class="viewer-panel">
+        <header class="viewer-head">
+          <div class="viewer-info"><h3 id="vTitle"></h3><span class="mono" id="vMeta"></span></div>
+          <div class="viewer-actions">
+            <a id="vVerify" class="v-btn" target="_blank" rel="noopener">${icon("external")}<span>Verify</span></a>
+            <a id="vDownload" class="v-btn" download>${icon("download")}<span>PDF</span></a>
+            <button class="v-btn v-close" data-close aria-label="Close">${icon("close")}</button>
+          </div>
+        </header>
+        <div class="viewer-body">
+          <button class="v-nav prev" aria-label="Previous certificate">‹</button>
+          <div class="viewer-stage"><img id="vImg" alt="" /><iframe id="vPdf" title="Certificate PDF"></iframe></div>
+          <button class="v-nav next" aria-label="Next certificate">›</button>
+        </div>
+        <div class="viewer-count mono" id="vCount"></div>
+      </div>`;
+    document.body.appendChild(viewer);
+
+    const vImg = $("#vImg"), vPdf = $("#vPdf"), vDl = $("#vDownload"), vVerify = $("#vVerify");
+    let pos = 0, lastFocus = null;
+
+    const show = (p) => {
+      pos = (p + certs.length) % certs.length;
+      const c = certs[pos];
+      $("#vTitle").textContent = c.title;
+      $("#vMeta").textContent = [c.issuer, c.date, c.credentialId && `ID ${c.credentialId}`].filter(Boolean).join(" · ");
+      $("#vCount").textContent = `${pos + 1} / ${certs.length}`;
+      if (c.image) {
+        vImg.hidden = false; vPdf.hidden = true; vPdf.removeAttribute("src");
+        vImg.classList.remove("loaded");
+        vImg.onload = () => vImg.classList.add("loaded");
+        vImg.src = c.image; vImg.alt = `${c.title} certificate`;
+      } else {
+        vImg.hidden = true; vPdf.hidden = false; vPdf.src = c.file;
+      }
+      vDl.hidden = !c.file; if (c.file) vDl.href = c.file;
+      vVerify.hidden = !c.url; if (c.url) vVerify.href = c.url;
+      // preload neighbours so next/prev feel instant
+      [certs[(pos + 1) % certs.length], certs[(pos - 1 + certs.length) % certs.length]].forEach((n) => { if (n.image) new Image().src = n.image; });
+    };
+    const open = (p, trigger) => {
+      lastFocus = trigger || document.activeElement;
+      show(p);
+      viewer.hidden = false;
+      root.classList.add("modal-open");
+      document.dispatchEvent(new CustomEvent("viewer:toggle", { detail: true }));
+      requestAnimationFrame(() => viewer.classList.add("open"));
+      $(".v-close", viewer).focus();
+    };
+    const close = () => {
+      viewer.classList.remove("open");
+      root.classList.remove("modal-open");
+      document.dispatchEvent(new CustomEvent("viewer:toggle", { detail: false }));
+      setTimeout(() => { viewer.hidden = true; vPdf.removeAttribute("src"); }, 350);
+      if (lastFocus) lastFocus.focus({ preventScroll: true });
+    };
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".cert-open[data-cert]");
+      if (btn) { const idx = certs.findIndex((c) => c.i === +btn.dataset.cert); if (idx > -1) open(idx, btn); }
+    });
+    viewer.addEventListener("click", (e) => {
+      if (e.target.closest("[data-close]")) close();
+      else if (e.target.closest(".v-nav.prev")) show(pos - 1);
+      else if (e.target.closest(".v-nav.next")) show(pos + 1);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (viewer.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") show(pos + 1);
+      else if (e.key === "ArrowLeft") show(pos - 1);
+    });
+    // swipe on touch screens
+    let sx = null;
+    viewer.addEventListener("touchstart", (e) => (sx = e.touches[0].clientX), { passive: true });
+    viewer.addEventListener("touchend", (e) => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx; sx = null;
+      if (Math.abs(dx) > 50) show(pos + (dx < 0 ? 1 : -1));
+    });
+  }
 
   // Rotating role text (type / delete)
   const rot = $("#rotWord");
