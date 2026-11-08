@@ -260,7 +260,7 @@
       s.full ? s.render(i + 1) : `<section class="block" id="${s.id}"><div class="container">${s.render(i + 1)}</div></section>`
     ).join("");
   $("#footer").innerHTML = `<div class="container foot">
-      <span>© ${new Date().getFullYear()} ${esc(P.name)}. Designed & built by me.</span>
+      <span>© ${new Date().getFullYear()} ${esc(P.name)}.</span>
       <a href="#home">Back to top ↑</a>
     </div>`;
 
