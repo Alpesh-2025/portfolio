@@ -15,7 +15,7 @@ window.PORTFOLIO = {
     email: "ai.alpeshgaykar@gmail.com",
     phone: "+91 96041 77511",
     linkedin: "https://linkedin.com/in/alpeshgaykar",
-    github: "",            // e.g. "https://github.com/yourname"
+    github: "https://github.com/Alpesh-2025",
     resume: "",            // e.g. "assets/Alpesh_Gaykar_Resume.pdf"
     available: true,       // shows the "open to opportunities" badge
     headline: ["Turning data into", "intelligent systems."],
@@ -87,7 +87,7 @@ window.PORTFOLIO = {
       description:
         "Real-time face mask detection on live camera input using a CNN, classifying each face as Mask / No Mask with TensorFlow and OpenCV.",
       tech: ["Python", "OpenCV", "TensorFlow", "CNN"],
-      links: { github: "", demo: "" },
+      links: { github: "https://github.com/Alpesh-2025/Face_Mask_Detection", demo: "" },
     },
     {
       title: "NLP Sentiment Analyzer",
